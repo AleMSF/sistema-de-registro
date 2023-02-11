@@ -92,10 +92,10 @@ public class RegistroService {
         for (Usuario usuariosDaCidade : usuarios) {
 
             Usuario usuario  = usuarioRepository.findById(idCidade)
-                    .orElseThrow();
+                    .orElseThrow(() -> new ResponseStatusException((HttpStatus.BAD_REQUEST), "usuario not found"));
 
             Cidade cidade  = cidadeRepository.findById(idCidade)
-                    .orElseThrow();
+                    .orElseThrow(() -> new ResponseStatusException((HttpStatus.BAD_REQUEST), "cidade not found"));
 
             if (usuario.getIdCidade().equals(idCidade)){
                 UsuarioPorCidadeDTO usuarioPorCidadeDTO = UsuarioPorCidadeDTO.builder()
@@ -114,28 +114,31 @@ public class RegistroService {
         List<UsuarioDTO2> usuarioList = new ArrayList<>();
         List<Cidade> cidades = cidadeRepository.findAll();
         List<Cidade> cidadesDoEstado = new ArrayList<>();
+        List<Usuario> allUsuarios = usuarioRepository.findAll();
 
-        for (Cidade cidade1 : cidades) {
-            estadoRepository.findById(idEstado)
-                    .orElseThrow();
+        Estado estado = estadoRepository.findById(idEstado)
+                .orElseThrow(() -> new ResponseStatusException((HttpStatus.BAD_REQUEST), "estado not found"));
 
-            cidadesDoEstado.add(cidade1);
+
+        for (Cidade cidade : cidades) {
+            if(cidade.getIdEstado().equals(idEstado)){
+                cidadesDoEstado.add(cidade);
+            }
         }
 
-        for (Cidade cidade2 : cidadesDoEstado) {
-
-            Estado estado = estadoRepository.findById(cidade2.getIdEstado())
-                    .orElseThrow();
-
-                        UsuarioDTO2 usuario1 = UsuarioDTO2.builder()
-                        .idUsuario(usuario1.getIdUsuario())
-                        .nomeUsuario(usuario1.getNomeUsuario())
-                        .nomeCidade(cidade2.getCidadeNome())
-                        .nomeEstado(estado.getEstadoNome())
-                        .build();
-
-                usuarioList.add(usuario1);
+        for (Cidade cidade : cidadesDoEstado) {
+            for (Usuario user : allUsuarios){
+                if (user.getIdCidade().equals(cidade.getIdCidade())){
+                    UsuarioDTO2 x = UsuarioDTO2.builder()
+                            .idUsuario(user.getIdUsuario())
+                            .nomeUsuario(user.getUsuarioNome())
+                            .nomeCidade(cidade.getCidadeNome())
+                            .nomeEstado(estado.getEstadoNome())
+                            .build();
+                    usuarioList.add(x);
+                }
             }
+        }
         return usuarioList;
     }
 }
