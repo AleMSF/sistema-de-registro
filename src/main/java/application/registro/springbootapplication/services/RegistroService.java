@@ -61,28 +61,81 @@ public class RegistroService {
         List<Usuario> usuarios = usuarioRepository.findAll();
         List<UsuarioDTO> usuarioDTOS = new ArrayList<>();
 
+        for (Usuario usuarioDeTodosUsuarios : usuarios) {
 
-
-//        Estado estado = estadoRepository.
-//                .orElseThrow(() -> new ResponseStatusException((HttpStatus.BAD_REQUEST), "estado not found"));
-//
-//        Profissao profissao = profissaoRepository.
-//                .orElseThrow(() -> new ResponseStatusException((HttpStatus.BAD_REQUEST), "profissao not found"));
-
-        for (Usuario usuario : usuarios) {
-
-            Cidade cidade = cidadeRepository.findById(usuario.getIdCidade())
+            Cidade cidade = cidadeRepository.findById(usuarioDeTodosUsuarios.getIdCidade())
                 .orElseThrow(() -> new ResponseStatusException((HttpStatus.BAD_REQUEST), "cidade not found"));
 
+            Estado estado = estadoRepository.findById(cidade.getIdEstado())
+                .orElseThrow(() -> new ResponseStatusException((HttpStatus.BAD_REQUEST), "estado not found"));
+
+            Profissao profissao = profissaoRepository.findById(usuarioDeTodosUsuarios.getIdProfissao())
+                .orElseThrow(() -> new ResponseStatusException((HttpStatus.BAD_REQUEST), "profissao not found"));
+
             UsuarioDTO usuarioDTO = UsuarioDTO.builder()
-                    .idUsuario(usuario.getIdUsuario())
+                    .idUsuario(usuarioDeTodosUsuarios.getIdUsuario())
                     .nomeCidade(cidade.getCidadeNome())
-                    .nomeEsatdo(estado.getEstadoNome())
+                    .nomeEstado(estado.getEstadoNome())
                     .nomeProfissao(profissao.getProfissaoNome())
                     .salario(profissao.getSalario())
                     .build();
             usuarioDTOS.add(usuarioDTO);
         }
         return usuarioDTOS;
+    }
+
+    public List<UsuarioPorCidadeDTO> listTodosDaCidade(Long idCidade) {
+        List<Usuario> usuarios = usuarioRepository.findAll();
+
+        List<UsuarioPorCidadeDTO> usuarioPorCidadeDTOS = new ArrayList<>();
+
+        for (Usuario usuariosDaCidade : usuarios) {
+
+            Usuario usuario  = usuarioRepository.findById(idCidade)
+                    .orElseThrow();
+
+            Cidade cidade  = cidadeRepository.findById(idCidade)
+                    .orElseThrow();
+
+            if (usuario.getIdCidade().equals(idCidade)){
+                UsuarioPorCidadeDTO usuarioPorCidadeDTO = UsuarioPorCidadeDTO.builder()
+                        .idUsuario(usuariosDaCidade.getIdUsuario())
+                        .nomeUsuario(usuariosDaCidade.getUsuarioNome())
+                        .nomeCidade(cidade.getCidadeNome())
+                        .build();
+                usuarioPorCidadeDTOS.add(usuarioPorCidadeDTO);
+            }
+        }
+        return usuarioPorCidadeDTOS;
+    }
+
+    public List<UsuarioDTO2> listTodosDoEstado(Long idEstado) {
+
+        List<UsuarioDTO2> usuarioList = new ArrayList<>();
+        List<Cidade> cidades = cidadeRepository.findAll();
+        List<Cidade> cidadesDoEstado = new ArrayList<>();
+
+        for (Cidade cidade1 : cidades) {
+            estadoRepository.findById(idEstado)
+                    .orElseThrow();
+
+            cidadesDoEstado.add(cidade1);
+        }
+
+        for (Cidade cidade2 : cidadesDoEstado) {
+
+            Estado estado = estadoRepository.findById(cidade2.getIdEstado())
+                    .orElseThrow();
+
+                        UsuarioDTO2 usuario1 = UsuarioDTO2.builder()
+                        .idUsuario(usuario1.getIdUsuario())
+                        .nomeUsuario(usuario1.getNomeUsuario())
+                        .nomeCidade(cidade2.getCidadeNome())
+                        .nomeEstado(estado.getEstadoNome())
+                        .build();
+
+                usuarioList.add(usuario1);
+            }
+        return usuarioList;
     }
 }

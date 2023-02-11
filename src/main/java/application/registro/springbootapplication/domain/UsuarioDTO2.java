@@ -7,10 +7,9 @@ import java.math.BigDecimal;
 
 @Data
 @Builder
-public class UsuarioDTO {
+public class UsuarioDTO2 {
     private Long idUsuario;
+    private String nomeUsuario;
     private String nomeCidade;
     private String nomeEstado;
-    private String nomeProfissao;
-    private BigDecimal salario;
 }
